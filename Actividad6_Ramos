@@ -1,0 +1,42 @@
+from flask import Flask, request, jsonify
+import jwt
+import datetime
+
+app = Flask(__name__)
+SECRET_KEY = 'clave-secreta-super-segura'
+
+# Usuario de prueba 
+USUARIO = {
+    'username': 'admin',
+    'password': '1234'
+}
+
+# Ruta para autenticación
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    if data['username'] == USUARIO['username'] and data['password'] == USUARIO['password']:
+        token = jwt.encode({
+            'user': data['username'],
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=30)  # Expira en 30 segundos
+        }, SECRET_KEY, algorithm='HS256')
+        return jsonify({'token': token})
+    else:
+        return jsonify({'message': 'Credenciales inválidas'}), 401
+
+# Ruta protegida
+@app.route('/protegido', methods=['GET'])
+def protegido():
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({'message': 'Token requerido'}), 403
+    try:
+        decoded = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        return jsonify({'message': 'Acceso concedido', 'user': decoded['user']})
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Token expirado'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': 'Token inválido'}), 401
+
+if __name__ == '__main__':
+    app.run(debug=True)
