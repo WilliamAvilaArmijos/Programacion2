@@ -1,0 +1,9 @@
+import socket
+host = "outlook.office365.com"
+puerto = 993
+
+try:
+    socket.create_connection((host, puerto), timeout=5)
+    print(f" Conexión exitosa a {host}:{puerto} (IMAP - Hotmail)")
+except Exception as e:
+    print(f" Error al conectar: {e}")
