@@ -1,0 +1,35 @@
+class Buffer:
+    def __init__(self, size, circular=False):
+        self.size = size
+        self.buffer = []
+        self.circular = circular
+        self.rejected_data = []
+    def write(self, data):
+        if len(self.buffer) < self.size:
+            self.buffer.append(data)
+            print(f" Dato '{data}' almacenado en el buffer.")
+        else:
+            if self.circular:
+                overwritten = self.buffer.pop(0)
+                self.buffer.append(data)
+                print(f" Buffer lleno: se sobrescribió '{overwritten}' con '{data}'.")
+            else:
+                self.rejected_data.append(data)
+                print(f" Dato '{data}' rechazado. Buffer lleno.")
+    def show_buffer(self):
+        print(f"\n Contenido actual del buffer ({len(self.buffer)}/{self.size}): {self.buffer}")
+    def show_rejected(self):
+        if self.rejected_data:
+            print(f" Datos rechazados: {self.rejected_data}")
+        else:
+            print(" No se rechazaron datos.")
+                            # Simulación.
+if __name__ == "__main__":
+    print("=== Simulación de Escritura en un Buffer ===\n")    
+        # Cambia a circular=True para simular un buffer circular.
+    mi_buffer = Buffer(size=5, circular=False)
+    datos = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+    for d in datos:
+        mi_buffer.write(d)
+    mi_buffer.show_buffer()
+    mi_buffer.show_rejected()
